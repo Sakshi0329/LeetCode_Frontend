@@ -11,6 +11,10 @@ import Admin from "./pages/Admin";
 import AdminVideo from "./components/AdminVideo"
 import AdminDelete from "./components/AdminDelete"
 import AdminUpload from "./components/AdminUpload"
+import UpdateList from "./pages/AdminProblemList";
+import UpdateProblem from "./components/UpdateProblem";
+import AdminProblemList from "./pages/AdminProblemList";
+
 
 function App(){
   
@@ -38,7 +42,12 @@ function App(){
       <Route path="/admin/create" element={isAuthenticated && user?.role === 'admin' ? <AdminPanel /> : <Navigate to="/" />} />
       <Route path="/admin/delete" element={isAuthenticated && user?.role === 'admin' ? <AdminDelete /> : <Navigate to="/" />} />
       <Route path="/admin/video" element={isAuthenticated && user?.role === 'admin' ? <AdminVideo /> : <Navigate to="/" />} />
-      <Route path="/admin/upload/:problemId" element={isAuthenticated && user?.role === 'admin' ? <AdminUpload /> : <Navigate to="/" />} />
+      <Route path="/admin/upload" element={isAuthenticated && user?.role === 'admin' ? <AdminUpload /> : <Navigate to="/" />} />
+      <Route path="/admin/update" element={isAuthenticated && user?.role === 'admin' ? <AdminProblemList /> : <Navigate to="/" />} />
+     <Route
+  path="/admin/update/:id"
+  element={isAuthenticated && user?.role === 'admin' ? <UpdateProblem /> : <Navigate to="/" />}
+/>
       <Route path="/problem/:problemId" element={<ProblemPage/>}></Route>
       
     </Routes>

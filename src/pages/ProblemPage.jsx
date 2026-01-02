@@ -6,6 +6,7 @@ import axiosClient from "../utils/axiosClient"
 import SubmissionHistory from "../components/SubmissionHistory"
 import ChatAi from '../components/ChatAi';
 import VideoPlayer from '../components/VideoPlayer';
+import { Moon, Sun } from 'lucide-react';
 
 const langMap = {
         cpp: 'C++',
@@ -27,6 +28,25 @@ const ProblemPage = () => {
   let {problemId}  = useParams();
 
   const { handleSubmit } = useForm();
+
+  
+  /* ------------------ THEME (react-hook-form) ------------------ */
+  const { register, watch, setValue } = useForm({
+    defaultValues: {
+      theme: localStorage.getItem("theme") || "dark",
+    },
+  });
+
+  const theme = watch("theme");
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setValue("theme", theme === "dark" ? "light" : "dark");
+  };
 
  useEffect(() => {
     const fetchProblem = async () => {
@@ -151,6 +171,19 @@ const ProblemPage = () => {
 
   return (
     <div className="h-screen flex bg-base-100">
+      {/* 🌗 THEME TOGGLE */}
+      <div className="absolute top-1 right-7  z-50">
+        <button
+          onClick={toggleTheme}
+          className="btn btn-sm btn-circle btn-ghost "
+          title="Toggle Theme"
+        >
+           {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+          {theme === "dark" ? "" : ""}
+        </button>
+
+        <input type="hidden" {...register("theme")} />
+      </div>
       {/* Left Panel */}
       <div className="w-1/2 flex flex-col border-r border-base-300">
         {/* Left Tabs */}

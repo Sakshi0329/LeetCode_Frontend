@@ -1,64 +1,80 @@
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, NavLink } from 'react-router'; 
+import { useNavigate, NavLink } from 'react-router';
 import { loginUser } from "../authSlice";
-import { useEffect, useState } from 'react';
-
+import { Moon, Sun } from 'lucide-react';
 
 const loginSchema = z.object({
   emailId: z.string().email("Invalid Email"),
-  password: z.string().min(8, "Password is too weak") 
+  password: z.string().min(8, "Password is too weak")
 });
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
+  const [theme, setTheme] = useState("light");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isAuthenticated, loading, error } = useSelector((state) => state.auth);
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({ resolver: zodResolver(loginSchema) }); // Using renamed schema
+
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    resolver: zodResolver(loginSchema)
+  });
 
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/');
-    }
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
+  useEffect(() => {
+    if (isAuthenticated) navigate('/');
   }, [isAuthenticated, navigate]);
 
-  const onSubmit = (data) => {
-    dispatch(loginUser(data));
-  };
+  const onSubmit = (data) => dispatch(loginUser(data));
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-base-200"> {/* Added bg for contrast */}
-      <div className="card w-96 bg-base-100 shadow-xl">
-        <div className="card-body">
-          <h2 className="card-title justify-center text-3xl mb-6">Leetcode</h2> {/* Added mb-6 */}
+    <div className="min-h-screen flex items-center justify-center bg-base-200 px-4">
+      <div className="card w-full max-w-md shadow-2xl bg-base-100 border border-gray-200 dark:border-gray-700 transition-all duration-300">
+        
+        {/* Theme Toggle */}
+        <div className="flex justify-end p-4">
+          <button
+            className="btn btn-sm btn-ghost"
+            onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+          >
+             {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+            {theme === 'light' ? ' Dark' : ' Light'}
+          </button>
+        </div>
 
-          
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="form-control"> {/* Removed mt-4 from first form-control for tighter spacing to title or global error */}
-              <label className="label"> {/* Removed mb-1, default spacing should be fine */}
-                <span className="label-text">Email</span>
+        <div className="card-body p-8">
+          <h2 className="card-title justify-center text-3xl font-bold mb-6 text-primary">
+            LeetCode Login
+          </h2>
+
+          {/* API Error */}
+          {/* {error && <p className="text-error text-center mb-2">{error}</p>} */}
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {/* Email */}
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text font-semibold">Email</span>
               </label>
               <input
                 type="email"
                 placeholder="john@example.com"
-                className={`input input-bordered w-full ${errors.emailId ? 'input-error' : ''}`} 
+                className={`input input-bordered w-full ${errors.emailId ? 'input-error' : ''}`}
                 {...register('emailId')}
               />
-              {errors.emailId && (
-                <span className="text-error text-sm mt-1">{errors.emailId.message}</span>
-              )}
+              {errors.emailId && <span className="text-error text-sm mt-1">{errors.emailId.message}</span>}
             </div>
 
+            {/* Password */}
             <div className="form-control mt-4">
               <label className="label">
-                <span className="label-text">Password</span>
+                <span className="label-text font-semibold">Password</span>
               </label>
               <div className="relative">
                 <input
@@ -69,7 +85,7 @@ function Login() {
                 />
                 <button
                   type="button"
-                  className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
                   onClick={() => setShowPassword(!showPassword)}
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
@@ -85,34 +101,26 @@ function Login() {
                   )}
                 </button>
               </div>
-              {errors.password && (
-                <span className="text-error text-sm mt-1">{errors.password.message}</span>
-              )}
+              {errors.password && <span className="text-error text-sm mt-1">{errors.password.message}</span>}
             </div>
 
-            <div className="form-control mt-8 flex justify-center">
-              <button
-                type="submit"
-                className={`btn btn-primary ${loading ? 'loading btn-disabled' : ''}`} // Added btn-disabled for better UX with loading
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
-                    <span className="loading loading-spinner"></span>
-                    Logging in...
-                  </>
-                ) : 'Login'}
-              </button>
-            </div>
+            {/* Submit */}
+            <button
+              type="submit"
+              className={`btn btn-primary w-full mt-4 ${loading ? 'loading' : ''}`}
+              disabled={loading}
+            >
+              {loading ? 'Logging In...' : 'Login'}
+            </button>
           </form>
-          <div className="text-center mt-6">
-            <span className="text-sm">
-              Don't have an account?{' '} {/* Adjusted text slightly */}
-              <NavLink to="/signup" className="link link-primary">
-                Sign Up
-              </NavLink>
-            </span>
-          </div>
+
+          {/* Signup Link */}
+          <p className="text-center text-sm mt-6">
+            Don't have an account?{' '}
+            <NavLink to="/signup" className="link link-primary font-semibold">
+              Sign Up
+            </NavLink>
+          </p>
         </div>
       </div>
     </div>
