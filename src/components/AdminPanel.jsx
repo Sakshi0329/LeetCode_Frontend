@@ -88,6 +88,7 @@ function AdminPanel() {
       alert(`Error: ${error.response?.data?.message || error.message}`);
     }
   };
+  
 
   return (
     <div className="container mx-auto p-6">
